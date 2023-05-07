@@ -1,17 +1,7 @@
-// Define a global variable called hangman and assign it to a new instance of Hangman with a random word and a fixed number of guesses
-// You can use any words you like, but make sure they are lowercase and have no special characters or numbers
-// You can also use any number of guesses you like, but make sure it is reasonable for the difficulty level of your words
-
-// Define a function called render() that updates the puzzle and status paragraphs with their respective values from hangman.getPuzzle() and hangman.getStatusMessage()
-
-// Call render() once at the beginning of your script to display the initial state of the game to the player
-
-// Add an event listener to the window object that listens for the "keypress" event
-
 class Hangman {
   #word;
   #remainingGuesses;
-  #guesedLetters = [];
+  #guessedLetters = [];
   #status = 'playing';
 
   constructor(word, remainingGuesses) {
@@ -23,7 +13,7 @@ class Hangman {
   getPuzzle() {
     // a method that returns a string that represents the current state of the puzzle
     return this.#word.map(letter => {
-      if (this.#guesedLetters.includes(letter)) {
+      if (this.#guessedLetters.includes(letter)) {
         return letter;
       } else {
         return '*';
@@ -33,8 +23,9 @@ class Hangman {
 
   makeGuess(guess) {
     // a method that takes a single letter as a parameter and updates the game state accordingly
+    console.log(guess)
     if (guess.toLowerCase() === guess && !this.#guessedLetters.includes(guess)) {
-      this.#guesedLetters.push(guess);
+      this.#guessedLetters.push(guess);
       this.#remainingGuesses--;
       this.calculateStatus();
     }
@@ -42,7 +33,7 @@ class Hangman {
 
   calculateStatus() {
     // a method that updates the status property based on the current state of the game
-    if (!this.getPuzzle.split('').includes('*')) {
+    if (!this.getPuzzle().split('').includes('*')) {
       this.#status = 'finished';
       return;
     }
@@ -53,10 +44,41 @@ class Hangman {
   }
 
   getStatusMessage() {
+    if (this. #status === 'playing')
+      return 'Remaining guesses: ' + this.#remainingGuesses;
+
+    if (this.#status === 'finished') 
+      return 'Great work! You guessed the word!';
     
+    if (this.#status === 'failed')
+      return 'Nice try! The word was ' + this.#word.join('');
   }
 
+  getGuessedLetters() {
+    return this.#guessedLetters.join();
+  }
 }
 
 const hangman = new Hangman('hangman', 7);
-console.log(hangman.getPuzzle())
+
+function render() {
+  const puzzle = document.querySelector('#puzzle');
+  const status = document.querySelector('#status');
+  const guessedLetters = document.querySelector('#guessed-letters');
+
+  puzzle.textContent = hangman.getPuzzle();
+  status.textContent = hangman.getStatusMessage();
+
+  function guess(e) {
+    if (e.code < 65 || e.code > 90) return;
+
+    hangman.makeGuess(e.key);
+    puzzle.textContent = hangman.getPuzzle();
+    status.textContent = hangman.getStatusMessage();
+    guessedLetters.textContent = hangman.getGuessedLetters();
+  }
+
+  window.addEventListener('keypress', guess);
+}
+
+render();
